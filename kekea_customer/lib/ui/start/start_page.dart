@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kekea_core/bloc/dynamic_link_bloc/bloc.dart';
+import 'package:kekea_core/bloc/receipt_detail_bloc/bloc.dart';
 import 'package:kekea_core/bloc/user_auth_bloc/bloc.dart';
 
 import 'package:kekea_core/data/kekea_user/kekea_user.dart';
@@ -25,6 +26,9 @@ class StartPage extends StatelessWidget {
                   );
                 },
                 present: (Uri uri) {
+                  BlocProvider.of<ReceiptDetailBloc>(context).add(
+                    ReceiptDetailEvent.listenByUri(uri: uri),
+                  );
                   return ReceiptDetailPage();
                 },
               );

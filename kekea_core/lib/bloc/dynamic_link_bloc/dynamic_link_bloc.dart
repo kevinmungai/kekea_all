@@ -1,4 +1,4 @@
-import 'package:kekea_core/side_effects/database/firestore/payment_db_firestore.dart';
+import 'package:kekea_core/bloc/receipt_detail_bloc/bloc.dart';
 import 'package:kekea_core/utils/uri.dart';
 
 import '../../data/link_result/link_result.dart';
@@ -10,12 +10,12 @@ import 'package:meta/meta.dart';
 
 class DynamicLinkBloc extends Bloc<DynamicLinkEvent, DynamicLinkState> {
   final DynamicLink dynamicLink;
-  final PaymentDBFirestore paymentDBFirestore;
+  final ReceiptDetailBloc receiptDetailBloc;
 
   DynamicLinkBloc({
     @required this.dynamicLink,
-    @required this.paymentDBFirestore,
-  })  : assert(dynamicLink != null && paymentDBFirestore != null),
+    @required this.receiptDetailBloc,
+  })  : assert(dynamicLink != null && receiptDetailBloc != null),
         super(DynamicLinkState.absent());
 
   @override
@@ -25,14 +25,17 @@ class DynamicLinkBloc extends Bloc<DynamicLinkEvent, DynamicLinkState> {
     yield* event.when(
       checkForLink: () async* {
         final LinkResult linkResult = await dynamicLink.getLink();
-        linkResult.when(
+        yield* linkResult.when(
           present: (Uri uri) async* {
-            DynamicLinkState.present(uri: uri);
-
-            final bool isReceipt = isReceiptUri(uri);
+            yield DynamicLinkState.present(uri: uri);
+            if (isReceiptUri(uri)) {
+              receiptDetailBloc.add(
+                ReceiptDetailEvent.listenByUri(uri: uri),
+              );
+            }
           },
           absent: () async* {
-            DynamicLinkState.absent();
+            yield DynamicLinkState.absent();
           },
         );
       },

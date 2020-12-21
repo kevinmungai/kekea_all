@@ -13,4 +13,5 @@ abstract class ReceiptDetailState with _$ReceiptDetailState {
     @required Payment payment,
     BuiltList<PaymentProduct> paymentProducts,
   }) = _Present;
+  const factory ReceiptDetailState.paymentAbsent() = _PaymentAbsent;
 }

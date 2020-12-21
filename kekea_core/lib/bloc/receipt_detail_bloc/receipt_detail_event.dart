@@ -15,10 +15,12 @@ abstract class ReceiptDetailEvent with _$ReceiptDetailEvent {
   const factory ReceiptDetailEvent.listenByUri({
     @required Uri uri,
   }) = _ListenByUri;
+  const factory ReceiptDetailEvent.setNewData({
+    @required Payment payment,
+    @required BuiltList<PaymentProduct> paymentProducts,
+  }) = _SetNewData;
+  const factory ReceiptDetailEvent.setPaymentAbsent() = _SetPaymentAbsent;
   const factory ReceiptDetailEvent.setPayment({
     @required Payment payment,
   }) = _SetPayment;
-  const factory ReceiptDetailEvent.setPaymentProducts({
-    @required BuiltList<PaymentProduct> paymentProduct,
-  }) = _SetPaymentProducts;
 }
