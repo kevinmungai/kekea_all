@@ -90,8 +90,8 @@ class EditProductBloc extends Bloc<EditProductEvent, EditProductState> {
             yield* businessPersonStatusBloc.state.maybeWhen(
               present: (BusinessPerson businessPerson) async* {
                 final Product updatedProduct = productDBFirestore.updateProduct(
-                  businessId: businessPerson.defaultBusiness,
-                  storeId: businessPerson.defaultStore,
+                  businessId: businessPerson.defaultBusiness.id,
+                  storeId: businessPerson.defaultStore.id,
                   newProduct: editProduct.editable,
                 );
 

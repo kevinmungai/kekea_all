@@ -20,7 +20,9 @@ class StartPage extends StatelessWidget {
             builder: (context, state) {
               return state.when(
                 absent: () {
-                  return ReceiptListPage();
+                  return ReceiptListPage(
+                    kekeaUser: kekeaUser,
+                  );
                 },
                 present: (Uri uri) {
                   return ReceiptDetailPage();

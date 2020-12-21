@@ -1,5 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
+import 'package:kekea_core/data/business/business.dart';
+import 'package:kekea_core/data/store/store.dart';
 import '../../utils/constants.dart' as c;
 
 part 'business_person.freezed.dart';
@@ -12,8 +14,8 @@ abstract class BusinessPerson with _$BusinessPerson {
     @JsonKey(name: c.businessPersonEmail) String email,
     @JsonKey(name: c.businessPersonName) String name,
     @JsonKey(name: c.businessPersonPhone) String phone,
-    @JsonKey(name: c.businessPersonDefaultBusiness) String defaultBusiness,
-    @JsonKey(name: c.businessPersonDefaultStore) String defaultStore,
+    @JsonKey(name: c.businessPersonDefaultBusiness) Business defaultBusiness,
+    @JsonKey(name: c.businessPersonDefaultStore) Store defaultStore,
   }) = _BusinessPerson;
 
   factory BusinessPerson.fromJson(Map<String, dynamic> json) =>

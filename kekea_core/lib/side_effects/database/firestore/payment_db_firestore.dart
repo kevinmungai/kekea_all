@@ -1,5 +1,6 @@
 import 'package:built_collection/built_collection.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:kekea_core/data/payment_result/payment_result.dart';
 import '../../../data/business_member/business_member.dart';
 import '../../../data/payment/payment.dart';
 import '../../../data/payment_method/payment_method.dart';
@@ -15,6 +16,25 @@ class PaymentDBFirestore {
     @required this.firestore,
   });
 
+  String getPaymentId({
+    @required String businessId,
+    @required String storeId,
+  }) {
+    assert(businessId != null);
+    assert(businessId.isNotEmpty);
+    assert(storeId != null);
+    assert(storeId.isNotEmpty);
+
+    final DocumentReference docRef = firestore
+        .collection(fp.paymentCollectionPath(
+          businessId: businessId,
+          storeId: storeId,
+        ))
+        .doc();
+
+    return docRef.id;
+  }
+
   Payment createPayment({
     @required Payment payment,
   }) {
@@ -22,22 +42,21 @@ class PaymentDBFirestore {
     assert(payment.cashier != null);
     assert(payment.cashier.defaultBusiness != null);
     assert(payment.cashier.defaultStore != null);
+    assert(payment.id != null);
 
-    final DocumentReference docRef = firestore
-        .collection(
-          fp.paymentCollectionPath(
-            businessId: payment.cashier.defaultBusiness,
-            storeId: payment.cashier.defaultStore,
-          ),
-        )
-        .doc();
+    final DocumentReference docRef = firestore.doc(
+      fp.paymentDocumentPath(
+        businessId: payment.cashier.defaultBusiness.id,
+        storeId: payment.cashier.defaultStore.id,
+        paymentId: payment.id,
+      ),
+    );
 
     /**
      * Stripping away the defaultStore and defaultBusiness
      * so that they don't show up in the receipt.
      */
     final paymentWithId = payment.copyWith(
-      id: docRef.id,
       cashier: payment.cashier.copyWith(
         defaultStore: null,
         defaultBusiness: null,
@@ -225,5 +244,57 @@ class PaymentDBFirestore {
               )
               .toBuiltList(),
         );
+  }
+
+  /// A collection group query that streams the payments associated
+  /// with a particular customer's phone number.
+  Stream<BuiltList<Payment>> streamPaymentsByCustomerPhone({
+    @required String phone,
+  }) {
+    assert(phone != null);
+    assert(phone.isNotEmpty);
+
+    final String field = "${c.paymentCustomer}.${c.customerPhone}";
+    final Query query = firestore.collectionGroup(c.paymentProduct).where(
+          field,
+          isEqualTo: phone,
+        );
+
+    return query.snapshots().map(
+          (QuerySnapshot snap) => BuiltList(
+            snap.docs.map(
+              (doc) => Payment.fromJson(
+                doc.data(),
+              ),
+            ),
+          ),
+        );
+  }
+
+  Stream<PaymentResult> streamPaymentByUri({
+    @required Uri uri,
+  }) {
+    assert(uri != null);
+
+    final Query query = firestore
+        .collectionGroup(c.payment)
+        .where(
+          c.paymentUri,
+          isEqualTo: uri.toString(),
+        )
+        .limit(1);
+
+    return query.snapshots().map(
+      (QuerySnapshot snap) {
+        if (snap.docs.isNotEmpty) {
+          return PaymentResult.present(
+            payment: Payment.fromJson(
+              snap.docs.first.data(),
+            ),
+          );
+        }
+        return PaymentResult.absent();
+      },
+    );
   }
 }

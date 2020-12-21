@@ -25,6 +25,18 @@ _$_Payment _$_$_PaymentFromJson(Map<String, dynamic> json) {
             json['payment__payment_method'] as Map<String, dynamic>),
     timestamp: const TimestampConverter()
         .fromJson(json['payment__timestamp'] as Timestamp),
+    business: json['payment__business'] == null
+        ? null
+        : Business.fromJson(json['payment__business'] as Map<String, dynamic>),
+    store: json['payment__store'] == null
+        ? null
+        : Store.fromJson(json['payment__store'] as Map<String, dynamic>),
+    uri: json['payment__uri'] == null
+        ? null
+        : Uri.parse(json['payment__uri'] as String),
+    shortUri: json['payment__short_uri'] == null
+        ? null
+        : Uri.parse(json['payment__short_uri'] as String),
   );
 }
 
@@ -37,4 +49,8 @@ Map<String, dynamic> _$_$_PaymentToJson(_$_Payment instance) =>
       'payment__payment_method': instance.paymentMethod,
       'payment__timestamp':
           const TimestampConverter().toJson(instance.timestamp),
+      'payment__business': instance.business,
+      'payment__store': instance.store,
+      'payment__uri': instance.uri?.toString(),
+      'payment__short_uri': instance.shortUri?.toString(),
     };

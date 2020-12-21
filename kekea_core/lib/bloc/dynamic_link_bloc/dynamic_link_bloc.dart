@@ -1,3 +1,6 @@
+import 'package:kekea_core/side_effects/database/firestore/payment_db_firestore.dart';
+import 'package:kekea_core/utils/uri.dart';
+
 import '../../data/link_result/link_result.dart';
 import '../../side_effects/dynamic_link/dynamic_link.dart';
 
@@ -7,9 +10,12 @@ import 'package:meta/meta.dart';
 
 class DynamicLinkBloc extends Bloc<DynamicLinkEvent, DynamicLinkState> {
   final DynamicLink dynamicLink;
+  final PaymentDBFirestore paymentDBFirestore;
+
   DynamicLinkBloc({
     @required this.dynamicLink,
-  })  : assert(dynamicLink != null),
+    @required this.paymentDBFirestore,
+  })  : assert(dynamicLink != null && paymentDBFirestore != null),
         super(DynamicLinkState.absent());
 
   @override
@@ -22,6 +28,8 @@ class DynamicLinkBloc extends Bloc<DynamicLinkEvent, DynamicLinkState> {
         linkResult.when(
           present: (Uri uri) async* {
             DynamicLinkState.present(uri: uri);
+
+            final bool isReceipt = isReceiptUri(uri);
           },
           absent: () async* {
             DynamicLinkState.absent();

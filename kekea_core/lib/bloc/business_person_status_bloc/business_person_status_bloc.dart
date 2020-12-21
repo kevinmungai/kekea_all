@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
+import 'package:kekea_core/side_effects/dynamic_link/dynamic_link.dart';
 import 'package:meta/meta.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -47,6 +48,7 @@ class BusinessPersonStatusBloc
   final PaymentBloc paymentBloc;
   final PaymentProductDBFirestore paymentProductDBFirestore;
   final ProductDBFirestore productDBFirestore;
+  final DynamicLink dynamicLink;
 
   final StoreDBFirestore storeDBFirestore;
 
@@ -63,6 +65,7 @@ class BusinessPersonStatusBloc
     @required this.paymentBloc,
     @required this.paymentProductDBFirestore,
     @required this.productDBFirestore,
+    @required this.dynamicLink,
   })  : assert(businessPersonDBFirestore != null &&
             businessPersonBloc != null &&
             businessMemberBloc != null &&
@@ -72,7 +75,8 @@ class BusinessPersonStatusBloc
             paymentDBFirestore != null &&
             paymentBloc != null &&
             paymentProductDBFirestore != null &&
-            productDBFirestore != null),
+            productDBFirestore != null &&
+            dynamicLink != null),
         super(BusinessPersonStatusState.absent());
 
   @override
@@ -111,14 +115,14 @@ class BusinessPersonStatusBloc
         yield BusinessPersonStatusState.present(
           businessPerson: businessPerson,
         );
-
-        if (businessPerson.defaultBusiness == null) {
+        final _defaultBusiness = businessPerson?.defaultBusiness?.id;
+        if (_defaultBusiness == null) {
           final Business defaultBusiness =
               businessDBFirestore.createBusinessDocument(business: Business());
 
           add(
             BusinessPersonStatusEvent.setDefaultBusiness(
-              defaultBusiness: defaultBusiness.id,
+              defaultBusiness: defaultBusiness,
             ),
           );
 
@@ -127,8 +131,8 @@ class BusinessPersonStatusBloc
               businessId: defaultBusiness.id,
             ),
           );
-
-          if (businessPerson.defaultStore == null) {
+          final _defaultStore = businessPerson?.defaultStore?.id;
+          if (_defaultStore == null) {
             final Store store = storeDBFirestore.createStore(
               businessId: defaultBusiness.id,
               store: Store(),
@@ -136,7 +140,7 @@ class BusinessPersonStatusBloc
 
             add(
               BusinessPersonStatusEvent.setDefaultStore(
-                storeId: store.id,
+                store: store,
                 businessId: defaultBusiness.id,
               ),
             );
@@ -157,7 +161,7 @@ class BusinessPersonStatusBloc
         _streamSubscription?.cancel();
         yield BusinessPersonStatusState.absent();
       },
-      setDefaultBusiness: (String defaultBusiness) async* {
+      setDefaultBusiness: (Business defaultBusiness) async* {
         yield* state.maybeWhen(
           present: (BusinessPerson businessPerson) async* {
             businessPersonBloc.add(
@@ -190,13 +194,13 @@ class BusinessPersonStatusBloc
           },
         );
       },
-      setDefaultStore: (String storeId, String businessId) async* {
+      setDefaultStore: (Store store, String businessId) async* {
         yield* state.maybeWhen(
           present: (BusinessPerson businessPerson) async* {
             businessPersonBloc.add(
               bpc.BusinessPersonEvent.updateBusinessPerson(
                 businessPerson: businessPerson.copyWith(
-                  defaultStore: storeId,
+                  defaultStore: store,
                 ),
               ),
             );
@@ -229,10 +233,15 @@ class BusinessPersonStatusBloc
       present: (BusinessPerson businessPerson) async* {
         yield* productListStatusBloc.state.maybeWhen(
           present: (_, BuiltList<SaleProduct> selectedProducts, __) async* {
-            /**
-             * Create Payment
-             */
+            /// Get Payment Id
+            final String paymentId = paymentDBFirestore.getPaymentId(
+              businessId: businessPerson.defaultBusiness.id,
+              storeId: businessPerson.defaultStore.id,
+            );
+
+            /// Create Payment
             final Payment payment = Payment(
+              id: paymentId,
               cashier: businessPerson,
               customer: customer,
               paymentMethod: paymentMethod,
@@ -241,23 +250,25 @@ class BusinessPersonStatusBloc
                 currency: Currency(text: "KES"),
               ),
               timestamp: Timestamp.now(),
+              business: businessPerson.defaultBusiness,
+              store: businessPerson.defaultStore,
             );
 
-            /**
-             * Save Payment to the database
-             */
-            final Payment savedPayment = paymentDBFirestore.createPayment(
+            /// Create Dynamic Link and update the Payment.
+            final Payment updatedPayment = await dynamicLink.createDynamicLink(
               payment: payment,
+              business: businessPerson.defaultBusiness,
             );
 
-            /**
-             * Report the saved payment to the Payment Bloc
-             */
+            /// Save Payment to the database
+            final Payment savedPayment = paymentDBFirestore.createPayment(
+              payment: updatedPayment,
+            );
+
+            /// Report the saved payment to the Payment Bloc
             paymentBloc.add(PaymentEvent.paymentCreated(savedPayment));
 
-            /**
-             * Created the PaymentProducts that are to be saved under payment
-             */
+            /// Created the PaymentProducts that are to be saved under payment
             final BuiltList<PaymentProduct> paymentProducts = selectedProducts
                 .map(
                   (SaleProduct selectedProduct) => PaymentProduct(
@@ -270,51 +281,39 @@ class BusinessPersonStatusBloc
                 )
                 .toBuiltList();
 
-            /**
-             * Save the PaymentProducts in the database
-             */
+            /// Save the PaymentProducts in the database
             final BuiltList<PaymentProduct> savedPaymentProducts =
                 paymentProductDBFirestore.createPaymentProducts(
-              businessId: businessPerson.defaultBusiness,
-              storeId: businessPerson.defaultStore,
+              businessId: businessPerson.defaultBusiness.id,
+              storeId: businessPerson.defaultStore.id,
               paymentId: savedPayment.id,
               paymentProducts: paymentProducts,
             );
 
-            /**
-             * Report that the PaymentProducts have been saved in Cloud Firestore
-             */
+            /// Report that the PaymentProducts have been saved in Cloud Firestore
             paymentBloc.add(
               PaymentEvent.paymentProductsSaved(savedPaymentProducts),
             );
 
-            /**
-             * Update the products of the change in Quantity.
-             */
+            /// Update the products of the change in Quantity.
             final BuiltList<PaymentProduct> afterUpdatingProducts =
                 productDBFirestore.updateSoldProducts(
-              businessId: businessPerson.defaultBusiness,
-              storeId: businessPerson.defaultStore,
+              businessId: businessPerson.defaultBusiness.id,
+              storeId: businessPerson.defaultStore.id,
               paymentProducts: savedPaymentProducts,
             );
 
-            /**
-             * Report that the products have been updated.
-             */
+            /// Report that the products have been updated.
             paymentBloc.add(PaymentEvent.productsUpdated());
 
-            /**
-             * Reset the state of the Product List Status Bloc.
-             */
+            /// Reset the state of the Product List Status Bloc.
             productListStatusBloc.add(ProductListStatusEvent.cancel());
           },
           orElse: () async* {},
         );
       },
       orElse: () async* {
-        /**
-         * FORWARDING THE ERROR TO PAYMENT BLOC
-         */
+        /// FORWARDING THE ERROR TO PAYMENT BLOC
         paymentBloc.add(PaymentEvent.businessPersonDoesExist());
       },
     );

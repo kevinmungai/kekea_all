@@ -1,5 +1,9 @@
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
+import 'package:kekea_core/data/business/business.dart';
 import 'package:kekea_core/data/link_result/link_result.dart';
+import 'package:kekea_core/data/payment/payment.dart';
+import 'package:kekea_core/formatters/date_formatter.dart';
+import 'package:kekea_core/utils/uri.dart';
 import '../../utils/debug_print.dart';
 import 'package:meta/meta.dart';
 
@@ -25,5 +29,52 @@ class DynamicLink {
     );
 
     return linkResult;
+  }
+
+  Future<Payment> createDynamicLink({
+    @required Payment payment,
+    @required Business business,
+  }) async {
+    assert(payment != null);
+    assert(payment.id != null);
+    assert(payment.id.isNotEmpty);
+    assert(business != null);
+    assert(business.id != null);
+    assert(business.id.isNotEmpty);
+    assert(business.name != null);
+    assert(business.name.isNotEmpty);
+
+    final String dateTime = getDateFormat(payment.timestamp.toDate());
+    final Uri uri = getReceiptUri(payment.id);
+    final DynamicLinkParameters dynamicLinkParameters = DynamicLinkParameters(
+      link: uri,
+      uriPrefix: getPageLink().toString(),
+      androidParameters: AndroidParameters(
+        packageName: packageNameCustomer,
+      ),
+      iosParameters: IosParameters(
+        bundleId: bundleIdCustomer,
+      ),
+      googleAnalyticsParameters: GoogleAnalyticsParameters(
+        campaign: "receipts",
+        content: payment.id,
+        medium: "link-sms",
+        source: "${business.id} ${business.name}",
+      ),
+      socialMetaTagParameters: SocialMetaTagParameters(
+        description: "Receipt from ${business.name} at $dateTime",
+        title: "Receipt",
+      ),
+    );
+
+    final ShortDynamicLink shortDynamicLink =
+        await dynamicLinkParameters.buildShortLink();
+
+    dPrint(shortDynamicLink.warnings);
+
+    return payment.copyWith(
+      shortUri: shortDynamicLink.shortUrl,
+      uri: uri,
+    );
   }
 }

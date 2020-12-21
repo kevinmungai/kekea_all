@@ -46,15 +46,21 @@ const String productQuantity = "product__quantity";
 const String productTax = "product__tax";
 
 /// payment constants
+const String payment = "payment";
 const String paymentId = "payment__id";
 const String paymentCustomer = "payment__customer";
 const String paymentCashier = "payment__cashier";
 const String paymentPrice = "payment__price";
 const String paymentPaymentMethod = "payment__payment_method";
 const String paymentTimeStamp = "payment__timestamp";
-const String paymentProducts = "payment__products";
+const String paymentBusiness = "payment__business";
+const String paymentStore = "payment__store";
+const String paymentUri = "payment__uri";
+const String paymentShortUri = "payment__short_uri";
+// const String paymentProducts = "payment__products";
 
 /// payment_product constants
+const String paymentProduct = "payment_product";
 const String paymentProductId = "payment_product__id";
 const String paymentProductName = "payment_product__name";
 const String paymentProductPrice = "payment_product__price";
@@ -169,9 +175,7 @@ const String mpesaRequirementReferenceNumber =
 const String paymentMethodRequirementUnionKey =
     "payment_method_requirement__union_key";
 
-/**
- * Customer Phone Number
- */
+/// Customer Phone Number
 const String customerPhone = "customer_phone";
 
 /**

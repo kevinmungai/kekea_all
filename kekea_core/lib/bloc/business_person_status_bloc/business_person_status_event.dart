@@ -1,8 +1,10 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
+import 'package:kekea_core/data/business/business.dart';
 import 'package:kekea_core/data/customer/customer.dart';
 import 'package:kekea_core/data/payment_method/payment_method.dart';
 import 'package:kekea_core/data/business_person/business_person.dart';
+import 'package:kekea_core/data/store/store.dart';
 
 part 'business_person_status_event.freezed.dart';
 
@@ -19,13 +21,13 @@ abstract class BusinessPersonStatusEvent with _$BusinessPersonStatusEvent {
   }) = _SetAbsent;
   const factory BusinessPersonStatusEvent.stopListening() = _StopListening;
   const factory BusinessPersonStatusEvent.setDefaultBusiness({
-    @required String defaultBusiness,
+    @required Business defaultBusiness,
   }) = _SetDefaultBusiness;
   const factory BusinessPersonStatusEvent.createBusinessMember({
     @required String businessId,
   }) = _CreateBusinessMember;
   const factory BusinessPersonStatusEvent.setDefaultStore({
-    @required String storeId,
+    @required Store store,
     @required String businessId,
   }) = _CreateStore;
   const factory BusinessPersonStatusEvent.submitPayment({

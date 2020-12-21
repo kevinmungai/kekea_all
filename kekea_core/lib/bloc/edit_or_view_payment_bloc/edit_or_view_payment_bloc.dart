@@ -39,8 +39,8 @@ class EditOrViewPaymentBloc
             _streamSubscription?.cancel();
             _streamSubscription = paymentProductDBFirestore
                 .streamPaymentProducts(
-              businessId: businessPerson.defaultBusiness,
-              storeId: businessPerson.defaultStore,
+              businessId: businessPerson.defaultBusiness.id,
+              storeId: businessPerson.defaultStore.id,
               paymentId: payment.id,
             )
                 .listen(

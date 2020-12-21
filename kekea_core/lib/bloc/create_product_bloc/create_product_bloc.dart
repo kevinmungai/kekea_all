@@ -90,8 +90,8 @@ class CreateProductBloc extends Bloc<CreateProductEvent, CreateProductState> {
             yield* businessPersonStatusBloc.state.maybeWhen(
               present: (BusinessPerson businessPerson) async* {
                 final Product createdProduct = productDBFirestore.createProduct(
-                  businessId: businessPerson.defaultBusiness,
-                  storeId: businessPerson.defaultStore,
+                  businessId: businessPerson.defaultBusiness.id,
+                  storeId: businessPerson.defaultStore.id,
                   product: product,
                 );
                 yield CreateProductState.created(product: createdProduct);

@@ -12,8 +12,14 @@ _$_BusinessPerson _$_$_BusinessPersonFromJson(Map<String, dynamic> json) {
     email: json['business_person__email'] as String,
     name: json['business_person__name'] as String,
     phone: json['business_person__phone'] as String,
-    defaultBusiness: json['business_person__default_business'] as String,
-    defaultStore: json['business_person__default_store'] as String,
+    defaultBusiness: json['business_person__default_business'] == null
+        ? null
+        : Business.fromJson(
+            json['business_person__default_business'] as Map<String, dynamic>),
+    defaultStore: json['business_person__default_store'] == null
+        ? null
+        : Store.fromJson(
+            json['business_person__default_store'] as Map<String, dynamic>),
   );
 }
 

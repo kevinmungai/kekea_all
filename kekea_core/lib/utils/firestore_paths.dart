@@ -1,4 +1,5 @@
 import 'package:meta/meta.dart';
+import './constants.dart' as c;
 
 /// person paths
 ///
@@ -97,7 +98,7 @@ String paymentProductCollectionPath({
     storeId: storeId,
     paymentId: paymentId,
   );
-  return "$res/payment_product";
+  return "$res/${c.paymentProduct}";
 }
 
 /// /business/businessId/store/storeId/payment/paymentId/payment_product/payment_productId/
