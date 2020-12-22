@@ -81,6 +81,7 @@ class ReceiptDetailBloc extends Bloc<ReceiptDetailEvent, ReceiptDetailState> {
   Stream<ReceiptDetailState> listenByPayment({
     @required Payment payment,
   }) async* {
+    yield ReceiptDetailState.present(payment: payment);
     _paymentProductsSubscription?.cancel();
     _paymentProductsSubscription = paymentProductDBFirestore
         .streamPaymentProducts(

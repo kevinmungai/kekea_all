@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kekea_core/bloc/edit_or_view_payment_bloc/bloc.dart';
 import 'package:kekea_core/data/edit_or_view_payment/edit_or_view_payment.dart';
-import 'package:kekea_merchant/ui/sale_solo/sale_solo_tile.dart';
+import 'package:kekea_core/ui/sale_solo/sale_solo_tile.dart';
 
 class SaleSoloList extends StatelessWidget {
   @override

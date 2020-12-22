@@ -28,8 +28,8 @@ class SaleListPage extends StatelessWidget {
                 present: (BusinessPerson businessPerson) {
                   BlocProvider.of<PaymentListStatusBloc>(context).add(
                     PaymentListStatusEvent.listen(
-                      businessId: businessPerson.defaultBusiness,
-                      storeId: businessPerson.defaultStore,
+                      businessId: businessPerson.defaultBusiness.id,
+                      storeId: businessPerson.defaultStore.id,
                     ),
                   );
                   return BlocBuilder<PaymentListStatusBloc,

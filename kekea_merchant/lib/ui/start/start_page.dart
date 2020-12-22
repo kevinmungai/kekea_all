@@ -32,8 +32,8 @@ class StartPage extends StatelessWidget {
                         businessPerson.defaultStore != null) {
                       BlocProvider.of<ProductListStatusBloc>(context).add(
                         ProductListStatusEvent.listen(
-                          businessId: businessPerson.defaultBusiness,
-                          storeId: businessPerson.defaultStore,
+                          businessId: businessPerson.defaultBusiness.id,
+                          storeId: businessPerson.defaultStore.id,
                         ),
                       );
                     }

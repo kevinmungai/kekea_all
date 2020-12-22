@@ -1,8 +1,8 @@
 import 'package:kekea_core/bloc/receipt_detail_bloc/bloc.dart';
 import 'package:kekea_core/utils/uri.dart';
 
-import '../../data/link_result/link_result.dart';
-import '../../side_effects/dynamic_link/dynamic_link.dart';
+import 'package:kekea_core/data/link_result/link_result.dart';
+import 'package:kekea_core/side_effects/dynamic_link/dynamic_link.dart';
 
 import './bloc.dart';
 import 'package:bloc/bloc.dart';

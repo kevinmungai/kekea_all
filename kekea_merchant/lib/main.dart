@@ -27,8 +27,10 @@ import 'package:kekea_core/side_effects/database/firestore/payment_db_firestore.
 import 'package:kekea_core/side_effects/database/firestore/payment_product_db_firestore.dart';
 import 'package:kekea_core/side_effects/database/firestore/product_db_firestore.dart';
 import 'package:kekea_core/side_effects/database/firestore/store_db_firestore.dart';
+import 'package:kekea_core/side_effects/dynamic_link/dynamic_link.dart';
 import 'package:kekea_core/utils/get_firestore.dart';
 import 'package:kekea_merchant/ui/start/start_page.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -71,6 +73,10 @@ void main() async {
   final PaymentProductDBFirestore paymentProductDBFirestore =
       PaymentProductDBFirestore(
     firestore: firestore,
+  );
+
+  final DynamicLink dynamicLink = DynamicLink(
+    dynamicLinks: FirebaseDynamicLinks.instance,
   );
 
 /**
@@ -122,6 +128,7 @@ void main() async {
     paymentDBFirestore: paymentDBFirestore,
     businessDBFirestore: businessDBFirestore,
     storeDBFirestore: storeDBFirestore,
+    dynamicLink: dynamicLink,
   );
 
   final StoreStatusBloc storeStatusBloc = StoreStatusBloc(
