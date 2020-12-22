@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
+import 'package:kekea_core/side_effects/database/firestore/business_member_db_firestore.dart';
 import 'package:kekea_core/side_effects/dynamic_link/dynamic_link.dart';
+import 'package:kekea_core/utils/debug_print.dart';
 import 'package:meta/meta.dart';
 import 'package:built_collection/built_collection.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -48,6 +50,7 @@ class BusinessPersonStatusBloc
   final PaymentBloc paymentBloc;
   final PaymentProductDBFirestore paymentProductDBFirestore;
   final ProductDBFirestore productDBFirestore;
+  final BusinessMemberDBFirestore businessMemberDBFirestore;
   final DynamicLink dynamicLink;
 
   final StoreDBFirestore storeDBFirestore;
@@ -66,6 +69,7 @@ class BusinessPersonStatusBloc
     @required this.paymentProductDBFirestore,
     @required this.productDBFirestore,
     @required this.dynamicLink,
+    @required this.businessMemberDBFirestore,
   })  : assert(businessPersonDBFirestore != null &&
             businessPersonBloc != null &&
             businessMemberBloc != null &&
@@ -76,7 +80,8 @@ class BusinessPersonStatusBloc
             paymentBloc != null &&
             paymentProductDBFirestore != null &&
             productDBFirestore != null &&
-            dynamicLink != null),
+            dynamicLink != null &&
+            businessMemberDBFirestore != null),
         super(BusinessPersonStatusState.absent());
 
   @override
@@ -115,100 +120,51 @@ class BusinessPersonStatusBloc
         yield BusinessPersonStatusState.present(
           businessPerson: businessPerson,
         );
-        final _defaultBusiness = businessPerson?.defaultBusiness?.id;
-        if (_defaultBusiness == null) {
-          final Business defaultBusiness =
-              businessDBFirestore.createBusinessDocument(business: Business());
+        final String _defaultBusiness = businessPerson?.defaultBusiness?.id;
+        final String _defaultStore = businessPerson?.defaultStore?.id;
 
-          add(
-            BusinessPersonStatusEvent.setDefaultBusiness(
-              defaultBusiness: defaultBusiness,
+        if (_defaultBusiness == null && _defaultStore == null) {
+          final Business business = businessDBFirestore.createBusinessDocument(
+            business: Business(),
+          );
+
+          final Store store = storeDBFirestore.createStore(
+            businessId: business.id,
+            store: Store(),
+          );
+
+          final BusinessPerson updatedBusinessPerson =
+              businessPersonDBFirestore.updateBusinessPerson(
+            businessPerson: businessPerson.copyWith(
+              defaultBusiness: business,
+              defaultStore: store,
             ),
           );
 
-          add(
-            BusinessPersonStatusEvent.createBusinessMember(
-              businessId: defaultBusiness.id,
+          yield BusinessPersonStatusState.present(
+            businessPerson: updatedBusinessPerson,
+          );
+
+          final BusinessMember businessMember =
+              businessMemberDBFirestore.createBusinessMember(
+            businessId: business.id,
+            businessMember: BusinessMember(
+              firebaseId: businessPerson.firebaseId,
             ),
           );
-          final _defaultStore = businessPerson?.defaultStore?.id;
-          if (_defaultStore == null) {
-            final Store store = storeDBFirestore.createStore(
-              businessId: defaultBusiness.id,
-              store: Store(),
-            );
-
-            add(
-              BusinessPersonStatusEvent.setDefaultStore(
-                store: store,
-                businessId: defaultBusiness.id,
-              ),
-            );
-          }
         }
       },
       setAbsent: (String firebaseId) async* {
         yield BusinessPersonStatusState.absent();
-        businessPersonBloc.add(
-          bpc.BusinessPersonEvent.createBusinessPerson(
-            businessPerson: BusinessPerson(
-              firebaseId: firebaseId,
-            ),
+        final bizPerson = businessPersonDBFirestore.createBusinessPerson(
+          businessPerson: BusinessPerson(
+            firebaseId: firebaseId,
           ),
         );
       },
       stopListening: () async* {
         _streamSubscription?.cancel();
         yield BusinessPersonStatusState.absent();
-      },
-      setDefaultBusiness: (Business defaultBusiness) async* {
-        yield* state.maybeWhen(
-          present: (BusinessPerson businessPerson) async* {
-            businessPersonBloc.add(
-              bpc.BusinessPersonEvent.updateBusinessPerson(
-                businessPerson: businessPerson.copyWith(
-                  defaultBusiness: defaultBusiness,
-                ),
-              ),
-            );
-          },
-          orElse: () async* {
-            yield state;
-          },
-        );
-      },
-      createBusinessMember: (String businessId) async* {
-        yield* state.maybeWhen(
-          present: (BusinessPerson businessPerson) async* {
-            businessMemberBloc.add(
-              BusinessMemberEvent.create(
-                businessId: businessId,
-                businessMember: BusinessMember(
-                  firebaseId: businessPerson.firebaseId,
-                ),
-              ),
-            );
-          },
-          orElse: () async* {
-            yield state;
-          },
-        );
-      },
-      setDefaultStore: (Store store, String businessId) async* {
-        yield* state.maybeWhen(
-          present: (BusinessPerson businessPerson) async* {
-            businessPersonBloc.add(
-              bpc.BusinessPersonEvent.updateBusinessPerson(
-                businessPerson: businessPerson.copyWith(
-                  defaultStore: store,
-                ),
-              ),
-            );
-          },
-          orElse: () async* {
-            yield state;
-          },
-        );
       },
       submitPayment: (
         PaymentMethod paymentMethod,

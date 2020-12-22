@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:kekea_core/utils/debug_print.dart';
 import '../../../data/business_person_result/business_person_result.dart';
 import 'package:meta/meta.dart';
 import '../../../data/business_person/business_person.dart';
@@ -57,16 +58,21 @@ class BusinessPersonDBFirestore {
   BusinessPerson updateBusinessPerson({
     @required BusinessPerson businessPerson,
   }) {
+    assert(businessPerson != null);
+    dPrint("businessPerson: $businessPerson");
     final DocumentReference docRef = firestore.doc(
       fp.businessPersonDocumentPath(businessPerson.firebaseId),
     );
 
-    docRef.set(
-      businessPerson.toJson(),
-      SetOptions(
-        merge: true,
-      ),
-    );
+    // docRef.set(
+    //   businessPerson.toJson(),
+    //   SetOptions(
+    //     merge: true,
+    //   ),
+    // );
+
+    docRef.update(businessPerson.toJson());
+    dPrint("update succeeded");
 
     return businessPerson;
   }

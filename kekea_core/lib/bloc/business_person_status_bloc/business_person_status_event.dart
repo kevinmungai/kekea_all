@@ -20,16 +20,6 @@ abstract class BusinessPersonStatusEvent with _$BusinessPersonStatusEvent {
     @required String firebaseId,
   }) = _SetAbsent;
   const factory BusinessPersonStatusEvent.stopListening() = _StopListening;
-  const factory BusinessPersonStatusEvent.setDefaultBusiness({
-    @required Business defaultBusiness,
-  }) = _SetDefaultBusiness;
-  const factory BusinessPersonStatusEvent.createBusinessMember({
-    @required String businessId,
-  }) = _CreateBusinessMember;
-  const factory BusinessPersonStatusEvent.setDefaultStore({
-    @required Store store,
-    @required String businessId,
-  }) = _CreateStore;
   const factory BusinessPersonStatusEvent.submitPayment({
     @required PaymentMethod paymentMethod,
     @required Customer customer,

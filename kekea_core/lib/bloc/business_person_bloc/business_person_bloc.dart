@@ -1,3 +1,4 @@
+import 'package:kekea_core/utils/debug_print.dart';
 import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
 import './bloc.dart';
@@ -30,6 +31,7 @@ class BusinessPersonBloc
             businessPersonDBFirestore.updateBusinessPerson(
           businessPerson: businessPerson,
         );
+        dPrint("updatedBusinessPerson: $updatedBusinessPerson");
         yield BusinessPersonState.updateSuccess(
           businessPerson: updatedBusinessPerson,
         );
