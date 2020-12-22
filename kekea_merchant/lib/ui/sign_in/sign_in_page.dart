@@ -15,7 +15,7 @@ class SignInPage extends StatelessWidget {
               child: Row(
                 children: [
                   Image.asset(
-                    "assets/google_logo.png",
+                    "assets/img/google_logo.png",
                     height: 18,
                   ),
                   Padding(
