@@ -129,6 +129,7 @@ void main() async {
     businessDBFirestore: businessDBFirestore,
     storeDBFirestore: storeDBFirestore,
     dynamicLink: dynamicLink,
+    businessMemberDBFirestore: businessMemberDBFirestore,
   );
 
   final StoreStatusBloc storeStatusBloc = StoreStatusBloc(

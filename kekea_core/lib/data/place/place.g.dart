@@ -6,7 +6,7 @@ part of 'place.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_Place _$_$_PlaceFromJson(Map<String, dynamic> json) {
+_$_Place _$_$_PlaceFromJson(Map json) {
   return _$_Place(
     geoPoint:
         const GeoPointConverter().fromJson(json['place__geopoint'] as GeoPoint),
@@ -18,11 +18,21 @@ _$_Place _$_$_PlaceFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$_$_PlaceToJson(_$_Place instance) => <String, dynamic>{
-      'place__geopoint': const GeoPointConverter().toJson(instance.geoPoint),
-      'place__description': instance.description,
-      'place__street_name': instance.streetName,
-      'place__directions': instance.directions,
-      'place__extra_info': instance.extraInfo,
-      'place__property_name': instance.propertyName,
-    };
+Map<String, dynamic> _$_$_PlaceToJson(_$_Place instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull(
+      'place__geopoint', const GeoPointConverter().toJson(instance.geoPoint));
+  writeNotNull('place__description', instance.description);
+  writeNotNull('place__street_name', instance.streetName);
+  writeNotNull('place__directions', instance.directions);
+  writeNotNull('place__extra_info', instance.extraInfo);
+  writeNotNull('place__property_name', instance.propertyName);
+  return val;
+}

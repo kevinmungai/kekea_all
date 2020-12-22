@@ -6,7 +6,7 @@ part of 'payment_method.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_Cash _$_$_CashFromJson(Map<String, dynamic> json) {
+_$_Cash _$_$_CashFromJson(Map json) {
   return _$_Cash(
     amountGiven: json['amount_given'] == null
         ? null
@@ -17,38 +17,74 @@ _$_Cash _$_$_CashFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$_$_CashToJson(_$_Cash instance) => <String, dynamic>{
-      'amount_given': instance.amountGiven?.toString(),
-      'total': instance.total?.toString(),
-      'change': instance.change?.toString(),
-    };
+Map<String, dynamic> _$_$_CashToJson(_$_Cash instance) {
+  final val = <String, dynamic>{};
 
-_$_Mpesa _$_$_MpesaFromJson(Map<String, dynamic> json) {
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('amount_given', instance.amountGiven?.toString());
+  writeNotNull('total', instance.total?.toString());
+  writeNotNull('change', instance.change?.toString());
+  return val;
+}
+
+_$_Mpesa _$_$_MpesaFromJson(Map json) {
   return _$_Mpesa(
     refNumber: json['ref_number'] as String,
   );
 }
 
-Map<String, dynamic> _$_$_MpesaToJson(_$_Mpesa instance) => <String, dynamic>{
-      'ref_number': instance.refNumber,
-    };
+Map<String, dynamic> _$_$_MpesaToJson(_$_Mpesa instance) {
+  final val = <String, dynamic>{};
 
-_$_Card _$_$_CardFromJson(Map<String, dynamic> json) {
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('ref_number', instance.refNumber);
+  return val;
+}
+
+_$_Card _$_$_CardFromJson(Map json) {
   return _$_Card(
     refNumber: json['ref_number'] as String,
   );
 }
 
-Map<String, dynamic> _$_$_CardToJson(_$_Card instance) => <String, dynamic>{
-      'ref_number': instance.refNumber,
-    };
+Map<String, dynamic> _$_$_CardToJson(_$_Card instance) {
+  final val = <String, dynamic>{};
 
-_$_Credit _$_$_CreditFromJson(Map<String, dynamic> json) {
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('ref_number', instance.refNumber);
+  return val;
+}
+
+_$_Credit _$_$_CreditFromJson(Map json) {
   return _$_Credit(
     customerPhone: json['customer_phone'] as String,
   );
 }
 
-Map<String, dynamic> _$_$_CreditToJson(_$_Credit instance) => <String, dynamic>{
-      'customer_phone': instance.customerPhone,
-    };
+Map<String, dynamic> _$_$_CreditToJson(_$_Credit instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('customer_phone', instance.customerPhone);
+  return val;
+}

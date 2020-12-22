@@ -6,7 +6,7 @@ part of 'person.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$_Person _$_$_PersonFromJson(Map<String, dynamic> json) {
+_$_Person _$_$_PersonFromJson(Map json) {
   return _$_Person(
     phone: json['person__phone'] as String,
     name: json['person__name'] as String,
@@ -15,9 +15,18 @@ _$_Person _$_$_PersonFromJson(Map<String, dynamic> json) {
   );
 }
 
-Map<String, dynamic> _$_$_PersonToJson(_$_Person instance) => <String, dynamic>{
-      'person__phone': instance.phone,
-      'person__name': instance.name,
-      'person__email': instance.email,
-      'person__id': instance.id,
-    };
+Map<String, dynamic> _$_$_PersonToJson(_$_Person instance) {
+  final val = <String, dynamic>{};
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('person__phone', instance.phone);
+  writeNotNull('person__name', instance.name);
+  writeNotNull('person__email', instance.email);
+  writeNotNull('person__id', instance.id);
+  return val;
+}
