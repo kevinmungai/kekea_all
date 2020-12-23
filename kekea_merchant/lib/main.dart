@@ -39,184 +39,180 @@ void main() async {
     app: firebaseApp,
   );
   final GoogleSignIn googleSignIn = GoogleSignIn();
-  final AuthFire authFire = AuthFire(
-    firebaseAuth: firebaseAuth,
-    googleSignIn: googleSignIn,
-  );
   final FirebaseFirestore firestore = getFirestore(firebaseApp: firebaseApp);
-  final BusinessPersonDBFirestore businessPersonDBFirestore =
-      BusinessPersonDBFirestore(
-    firestore: firestore,
-  );
-
-  final StoreDBFirestore storeDBFirestore = StoreDBFirestore(
-    firestore: firestore,
-  );
-
-  final BusinessDBFirestore businessDBFirestore = BusinessDBFirestore(
-    firestore: firestore,
-  );
-
-  final BusinessMemberDBFirestore businessMemberDBFirestore =
-      BusinessMemberDBFirestore(
-    firestore: firestore,
-  );
-
-  final ProductDBFirestore productDBFirestore = ProductDBFirestore(
-    firestore: firestore,
-  );
-
-  final PaymentDBFirestore paymentDBFirestore = PaymentDBFirestore(
-    firestore: firestore,
-  );
-
-  final PaymentProductDBFirestore paymentProductDBFirestore =
-      PaymentProductDBFirestore(
-    firestore: firestore,
-  );
-
-  final DynamicLink dynamicLink = DynamicLink(
-    dynamicLinks: FirebaseDynamicLinks.instance,
-  );
 
 /**
  * Had to instantiate all BLOCs like this because **AuthBloc** doesn't
  * seem to start when instantiated inside the *lambda*.
  */
 
-  final SignalBloc signalBloc = SignalBloc();
-
-  final PaymentListStatusBloc paymentListStatusBloc = PaymentListStatusBloc(
-    paymentDBFirestore: paymentDBFirestore,
-  );
-
-  final PaymentBloc paymentBloc = PaymentBloc(
-    paymentDBFirestore: paymentDBFirestore,
-    paymentProductDBFirestore: paymentProductDBFirestore,
-    productDBFirestore: productDBFirestore,
-  );
-
-  final SignInBloc signInBloc = SignInBloc(
-    authFire: authFire,
-  );
-
-  final BusinessPersonBloc businessPersonBloc = BusinessPersonBloc(
-    businessPersonDBFirestore: businessPersonDBFirestore,
-  );
-
-  final BusinessMemberBloc businessMemberBloc = BusinessMemberBloc(
-    businessMemberDBFirestore: businessMemberDBFirestore,
-  );
-
-  final ProductListStatusBloc productListStatusBloc = ProductListStatusBloc(
-    productDBFirestore: productDBFirestore,
-  );
-
-  final StoreBloc storeBloc = StoreBloc(
-    storeDBFirestore: storeDBFirestore,
-  );
-
-  final BusinessPersonStatusBloc businessPersonStatusBloc =
-      BusinessPersonStatusBloc(
-    businessPersonDBFirestore: businessPersonDBFirestore,
-    businessPersonBloc: businessPersonBloc,
-    businessMemberBloc: businessMemberBloc,
-    paymentBloc: paymentBloc,
-    paymentProductDBFirestore: paymentProductDBFirestore,
-    productDBFirestore: productDBFirestore,
-    productListStatusBloc: productListStatusBloc,
-    paymentDBFirestore: paymentDBFirestore,
-    businessDBFirestore: businessDBFirestore,
-    storeDBFirestore: storeDBFirestore,
-    dynamicLink: dynamicLink,
-    businessMemberDBFirestore: businessMemberDBFirestore,
-  );
-
-  final StoreStatusBloc storeStatusBloc = StoreStatusBloc(
-    storeDBFirestore: storeDBFirestore,
-  );
-
-  final AuthBloc authBloc = AuthBloc(
-    authFire: authFire,
-    businessPersonStatusBloc: businessPersonStatusBloc,
-  )..add(AuthEvent.listenToAuthChanges());
-
-  final BusinessBloc businessBloc = BusinessBloc(
-    businessDBFirestore: businessDBFirestore,
-  );
-
-  final CreateProductBloc createProductBloc = CreateProductBloc(
-    productDBFirestore: productDBFirestore,
-    businessPersonStatusBloc: businessPersonStatusBloc,
-  );
-
-  final EditOrViewPaymentBloc editOrViewPaymentBloc = EditOrViewPaymentBloc(
-    businessPersonStatusBloc: businessPersonStatusBloc,
-    paymentProductDBFirestore: paymentProductDBFirestore,
-  );
-
-  final EditProductBloc editProductBloc = EditProductBloc(
-    businessPersonStatusBloc: businessPersonStatusBloc,
-    productDBFirestore: productDBFirestore,
-    signalBloc: signalBloc,
-  );
-
   runApp(
     MultiRepositoryProvider(
       providers: [
+        RepositoryProvider<AuthFire>(
+          create: (context) => AuthFire(
+            firebaseAuth: firebaseAuth,
+            googleSignIn: googleSignIn,
+          ),
+        ),
+        RepositoryProvider<BusinessPersonDBFirestore>(
+          create: (context) => BusinessPersonDBFirestore(
+            firestore: firestore,
+          ),
+        ),
+        RepositoryProvider<StoreDBFirestore>(
+          create: (context) => StoreDBFirestore(
+            firestore: firestore,
+          ),
+        ),
+        RepositoryProvider<BusinessDBFirestore>(
+          create: (context) => BusinessDBFirestore(
+            firestore: firestore,
+          ),
+        ),
+        RepositoryProvider<BusinessMemberDBFirestore>(
+          create: (context) => BusinessMemberDBFirestore(
+            firestore: firestore,
+          ),
+        ),
         RepositoryProvider<ProductDBFirestore>(
-          create: (context) => productDBFirestore,
+          create: (context) => ProductDBFirestore(
+            firestore: firestore,
+          ),
+        ),
+        RepositoryProvider<PaymentDBFirestore>(
+          create: (context) => PaymentDBFirestore(
+            firestore: firestore,
+          ),
         ),
         RepositoryProvider<PaymentProductDBFirestore>(
-          create: (context) => paymentProductDBFirestore,
+          create: (context) => PaymentProductDBFirestore(
+            firestore: firestore,
+          ),
+        ),
+        RepositoryProvider<DynamicLink>(
+          create: (context) => DynamicLink(
+            dynamicLinks: FirebaseDynamicLinks.instance,
+          ),
         ),
       ],
       child: MultiBlocProvider(
         providers: [
-          BlocProvider<EditProductBloc>(
-            create: (context) => editProductBloc,
-          ),
           BlocProvider<SignalBloc>(
-            create: (context) => signalBloc,
+            create: (context) => SignalBloc(),
           ),
           BlocProvider<PaymentListStatusBloc>(
-            create: (context) => paymentListStatusBloc,
+            create: (context) => PaymentListStatusBloc(
+              paymentDBFirestore:
+                  RepositoryProvider.of<PaymentDBFirestore>(context),
+            ),
           ),
           BlocProvider<PaymentBloc>(
-            create: (context) => paymentBloc,
+            create: (context) => PaymentBloc(
+              paymentDBFirestore:
+                  RepositoryProvider.of<PaymentDBFirestore>(context),
+              paymentProductDBFirestore:
+                  RepositoryProvider.of<PaymentProductDBFirestore>(context),
+              productDBFirestore:
+                  RepositoryProvider.of<ProductDBFirestore>(context),
+            ),
           ),
           BlocProvider<SignInBloc>(
-            create: (context) => signInBloc,
+            create: (context) => SignInBloc(
+              authFire: RepositoryProvider.of<AuthFire>(context),
+            ),
           ),
           BlocProvider<BusinessPersonBloc>(
-            create: (context) => businessPersonBloc,
+            create: (context) => BusinessPersonBloc(
+              businessPersonDBFirestore:
+                  RepositoryProvider.of<BusinessPersonDBFirestore>(context),
+            ),
           ),
           BlocProvider<BusinessMemberBloc>(
-            create: (context) => businessMemberBloc,
+            create: (context) => BusinessMemberBloc(
+              businessMemberDBFirestore:
+                  RepositoryProvider.of<BusinessMemberDBFirestore>(context),
+            ),
           ),
           BlocProvider<ProductListStatusBloc>(
-            create: (context) => productListStatusBloc,
+            create: (context) => ProductListStatusBloc(
+              productDBFirestore:
+                  RepositoryProvider.of<ProductDBFirestore>(context),
+            ),
           ),
           BlocProvider<StoreBloc>(
-            create: (context) => storeBloc,
+            create: (context) => StoreBloc(
+              storeDBFirestore:
+                  RepositoryProvider.of<StoreDBFirestore>(context),
+            ),
           ),
           BlocProvider<BusinessPersonStatusBloc>(
-            create: (context) => businessPersonStatusBloc,
+            create: (context) => BusinessPersonStatusBloc(
+              businessPersonDBFirestore:
+                  RepositoryProvider.of<BusinessPersonDBFirestore>(context),
+              businessPersonBloc: BlocProvider.of<BusinessPersonBloc>(context),
+              businessMemberBloc: BlocProvider.of<BusinessMemberBloc>(context),
+              paymentBloc: BlocProvider.of<PaymentBloc>(context),
+              paymentProductDBFirestore:
+                  RepositoryProvider.of<PaymentProductDBFirestore>(context),
+              productDBFirestore:
+                  RepositoryProvider.of<ProductDBFirestore>(context),
+              productListStatusBloc:
+                  BlocProvider.of<ProductListStatusBloc>(context),
+              paymentDBFirestore:
+                  RepositoryProvider.of<PaymentDBFirestore>(context),
+              businessDBFirestore:
+                  RepositoryProvider.of<BusinessDBFirestore>(context),
+              storeDBFirestore:
+                  RepositoryProvider.of<StoreDBFirestore>(context),
+              dynamicLink: RepositoryProvider.of<DynamicLink>(context),
+              businessMemberDBFirestore:
+                  RepositoryProvider.of<BusinessMemberDBFirestore>(context),
+            ),
+          ),
+          BlocProvider<EditProductBloc>(
+            create: (context) => EditProductBloc(
+              businessPersonStatusBloc:
+                  BlocProvider.of<BusinessPersonStatusBloc>(context),
+              productDBFirestore:
+                  RepositoryProvider.of<ProductDBFirestore>(context),
+              signalBloc: BlocProvider.of<SignalBloc>(context),
+            ),
           ),
           BlocProvider<StoreStatusBloc>(
-            create: (context) => storeStatusBloc,
+            create: (context) => StoreStatusBloc(
+              storeDBFirestore:
+                  RepositoryProvider.of<StoreDBFirestore>(context),
+            ),
           ),
           BlocProvider<AuthBloc>(
-            create: (context) => authBloc,
+            create: (context) => AuthBloc(
+              authFire: RepositoryProvider.of<AuthFire>(context),
+              businessPersonStatusBloc:
+                  BlocProvider.of<BusinessPersonStatusBloc>(context),
+            )..add(AuthEvent.listenToAuthChanges()),
           ),
           BlocProvider<BusinessBloc>(
-            create: (context) => businessBloc,
+            create: (context) => BusinessBloc(
+              businessDBFirestore:
+                  RepositoryProvider.of<BusinessDBFirestore>(context),
+            ),
           ),
           BlocProvider<CreateProductBloc>(
-            create: (context) => createProductBloc,
+            create: (context) => CreateProductBloc(
+              productDBFirestore:
+                  RepositoryProvider.of<ProductDBFirestore>(context),
+              businessPersonStatusBloc:
+                  BlocProvider.of<BusinessPersonStatusBloc>(context),
+            ),
           ),
           BlocProvider<EditOrViewPaymentBloc>(
-            create: (context) => editOrViewPaymentBloc,
+            create: (context) => EditOrViewPaymentBloc(
+              businessPersonStatusBloc:
+                  BlocProvider.of<BusinessPersonStatusBloc>(context),
+              paymentProductDBFirestore:
+                  RepositoryProvider.of<PaymentProductDBFirestore>(context),
+            ),
           ),
         ],
         child: MyApp(),
