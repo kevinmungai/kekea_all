@@ -41,8 +41,12 @@ class DynamicLink {
     assert(business != null);
     assert(business.id != null);
     assert(business.id.isNotEmpty);
-    assert(business.name != null);
-    assert(business.name.isNotEmpty);
+
+    /// TODO: MAKE SURE TO ADD BUSINESS NAME
+    // assert(business.name != null);
+    // assert(business.name.isNotEmpty);
+
+    final String bizName = business?.name ?? business.id;
 
     final String dateTime = getDateFormat(payment.timestamp.toDate());
     final Uri uri = getReceiptUri(payment.id);
@@ -52,17 +56,17 @@ class DynamicLink {
       androidParameters: AndroidParameters(
         packageName: packageNameCustomer,
       ),
-      iosParameters: IosParameters(
-        bundleId: bundleIdCustomer,
-      ),
+      // iosParameters: IosParameters(
+      //   bundleId: bundleIdCustomer,
+      // ),
       googleAnalyticsParameters: GoogleAnalyticsParameters(
         campaign: "receipts",
         content: payment.id,
         medium: "link-sms",
-        source: "${business.id} ${business.name}",
+        source: "${business.id} $bizName",
       ),
       socialMetaTagParameters: SocialMetaTagParameters(
-        description: "Receipt from ${business.name} at $dateTime",
+        description: "Receipt from $bizName at $dateTime",
         title: "Receipt",
       ),
     );
