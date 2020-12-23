@@ -38,6 +38,13 @@
             {
               "client_id": "785784320713-3f9loi97kt1a1ee2ai5ra05m8db5hab9.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "785784320713-c575cgfhd0o53rqmib43qkf1m3ef9ci2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kekea.customer.kekeaCustomer"
+              }
             }
           ]
         }
@@ -75,6 +82,13 @@
             {
               "client_id": "785784320713-3f9loi97kt1a1ee2ai5ra05m8db5hab9.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "785784320713-c575cgfhd0o53rqmib43qkf1m3ef9ci2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.kekea.customer.kekeaCustomer"
+              }
             }
           ]
         }
