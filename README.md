@@ -1,3 +1,3 @@
 # Kekea All
 
-The combined Kekea Project
+A monorepo for *Kekea* both the core, merchant and the client side.
